@@ -52,7 +52,7 @@ class ArdroidScriptCompiler {
 	if(firstWord.equals("script")) {
 
 	} else if(firstWord.equals("wait")) {
-
+	    return compileWait(words);
 	} else if(firstWord.equals("drive")) {
 
 	} else if(firstWord.equals("turn")) {
@@ -69,6 +69,29 @@ class ArdroidScriptCompiler {
 	
 	return words.toString();
     }
+
+    private String compileWait(List<String> words) throws ScriptException {
+	final ScriptException waitCommandException =
+	    new ScriptException("Invalid wait command."
+				+ " Must be: wait __ seconds");
+
+	if(words.size() != 3)
+	    throw waitCommandException;
+	if(!words.get(2).equals("seconds"))
+	    throw waitCommandException;
+	float seconds;
+	try {
+	    seconds = Float.parseFloat(words.get(1));
+	} catch (NumberFormatException e) {
+	    throw waitCommandException;
+	}
+	int millis = (int)(seconds * 1000);
+	if(millis > 99999)
+	    throw new ScriptException("Wait times must be below 100 seconds");
+	return "w" + String.format("%05d", millis);
+    }
+
+
     
     private List<String> splitWords(String line) {
 	String[] words = line.trim().split("[ \t]");
