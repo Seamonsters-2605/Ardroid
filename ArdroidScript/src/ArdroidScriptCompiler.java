@@ -50,7 +50,7 @@ class ArdroidScriptCompiler {
 	String firstWord = words.get(0);
 
 	if(firstWord.equals("script")) {
-
+	    
 	} else if(firstWord.equals("wait")) {
 	    return compileWait(words);
 	} else if(firstWord.equals("drive")) {
@@ -62,7 +62,7 @@ class ArdroidScriptCompiler {
 	} else if(firstWord.equals("stop")) {
 
 	} else if(firstWord.equals("do")) {
-
+	    return compileDo(words);
 	} else {
 	    throw new ScriptException("Unrecognized command: " + firstWord);
 	}
@@ -91,7 +91,43 @@ class ArdroidScriptCompiler {
 	return "w" + String.format("%05d", millis);
     }
 
+    private String compileDo(List<String> words) throws ScriptException {
+	final ScriptException scriptCommandException =
+	    new ScriptException("Invalid do command."
+				+ " Must be: do script __");
+	
+	if(words.size() < 3)
+	    throw scriptCommandException;
+	if(!words.get(1).equals("script"))
+	    throw scriptCommandException;
+	
+	String singleCommand = "r" + words.get(2);
+	if(words.size() > 3) {
+	    final ScriptException repeatedScriptCommandException =
+		new ScriptException("Invalid do command."
+				    + " Must be: do script __ __ times");
+	    if(words.size() != 5)
+		throw repeatedScriptCommandException;
+	    if(!words.get(4).equals("times"))
+		throw repeatedScriptCommandException;
+	    int numTimes;
+	    try {
+		numTimes = Integer.parseInt(words.get(3));
+	    } catch (NumberFormatException e) {
+		throw repeatedScriptCommandException;
+	    }
+	    StringBuilder command = new StringBuilder();
+	    
+	    for(int i = 0; i < numTimes; i++) {
+		command.append(singleCommand);
+		command.append(" ");
+	    }
 
+	    return command.toString();
+	} else {
+	    return singleCommand;
+	}
+    }
     
     private List<String> splitWords(String line) {
 	String[] words = line.trim().split("[ \t]");
