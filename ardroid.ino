@@ -9,6 +9,7 @@
 //#include "utility/Adafruit_PWMServoDriver.h"
 
 #define NUM_DC_MOTORS 4
+#define NUM_STEPPER_MOTORS 2
 
 //
 //   BLE Services Setup:
@@ -23,6 +24,18 @@ BLEIntCharacteristic dcMotorCharacteristics[NUM_DC_MOTORS] = {
   BLEIntCharacteristic("19B20003-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
   BLEIntCharacteristic("19B20004-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
 };
+BLEIntCharacteristic stepperMotorSettingsCharacteristics[NUM_STEPPER_MOTORS] = {
+  BLEIntCharacteristic("19B20005-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("19B20006-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
+};
+BLEIntCharacteristic stepperMotorPositionCharacteristics[NUM_STEPPER_MOTORS] = {
+  BLEIntCharacteristic("19B20007-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("19B20008-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
+};
+BLEIntCharacteristic stepperMotorSpeedCharacteristics[NUM_STEPPER_MOTORS] = {
+  BLEIntCharacteristic("19B20009-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("19B2000A-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
+};
 
 
 //
@@ -35,6 +48,7 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 
 // Motor ports start at Port 1 at index 0
 Adafruit_DCMotor * DCMotors[NUM_DC_MOTORS];
+Adafruit_StepperMotor * StepperMotors[NUM_STEPPER_MOTORS];
 
 
 const int ledPin = 13; // pin to use for the LED
@@ -43,6 +57,8 @@ const int ledPin = 13; // pin to use for the LED
 void setup() {
   //while (!Serial) ;  //uncomment to use serial moitor to debug
   Serial.begin(9600);
+
+  Serial.println("ARDROID");
 
   // set LED pin to output mode
   pinMode(ledPin, OUTPUT);
@@ -67,7 +83,15 @@ void setupBLE() {
     //set initial value
     dcMotorCharacteristics[i].setValue(0);
   }
-
+  for(int i=0; i<NUM_STEPPER_MOTORS; i++) {
+    blePeripheral.addAttribute(stepperMotorSettingsCharacteristics[i]);
+    blePeripheral.addAttribute(stepperMotorPositionCharacteristics[i]);
+    blePeripheral.addAttribute(stepperMotorSpeedCharacteristics[i]);
+    stepperMotorSettingsCharacteristics[i].setValue(0);
+    stepperMotorPositionCharacteristics[i].setValue(0);
+    stepperMotorSpeedCharacteristics[i].setValue(0);
+  }
+  
   // begin advertising BLE service:
   blePeripheral.begin();
 
@@ -78,6 +102,9 @@ void setupBLE() {
 void setupMotors() {
   for(int i=0; i<NUM_DC_MOTORS; i++)
     DCMotors[i] = AFMS.getMotor(i + 1); // motor port
+  for(int i=0; i<NUM_STEPPER_MOTORS; i++) {
+    StepperMotors[i] = AFMS.getStepper(200, i + 1); // steps per rotation, motor port
+  }
 
   //****Motor Shield Setup:*******
   AFMS.begin();  // create with the default frequency 1.6KHz
@@ -88,6 +115,11 @@ void setupMotors() {
     DCMotors[i]->setSpeed(0);
     DCMotors[i]->run(FORWARD);
   }
+  for(int i=0; i<NUM_STEPPER_MOTORS; i++) {
+    StepperMotors[i]->setSpeed(100);
+  }
+
+  Serial.println("Motors Initialized");
 }
 
 
@@ -95,8 +127,6 @@ void setupMotors() {
 void loop() {
   // listen for BLE peripherals to connect:
   BLECentral central = blePeripheral.central();
-  static int motorSpeeds[NUM_DC_MOTORS] = {0,0,0,0};
-  bool handlenewval = false;
 
   // if a central is connected to peripheral:
   if (central) {
@@ -104,35 +134,72 @@ void loop() {
     // print the central's MAC address:
     Serial.println(central.address());
 
+    int dcMotorSpeeds[NUM_DC_MOTORS] = {0,0,0,0};
+    int stepperMotorSpeeds[NUM_STEPPER_MOTORS] = {0,0};
+    bool updateDCMotors = false;
+
     // while the central is still connected to peripheral:
     while (central.connected()) {
-
+      
       for(int i=0; i<NUM_DC_MOTORS; i++) {
         if(dcMotorCharacteristics[i].written()) {
-          handlenewval = true;
-          motorSpeeds[i] = dcMotorCharacteristics[i].value();
+          updateDCMotors = true;
+          dcMotorSpeeds[i] = dcMotorCharacteristics[i].value();
+        }
+      }
+
+      for(int i=0; i<NUM_STEPPER_MOTORS; i++) {
+        if(stepperMotorSettingsCharacteristics[i].written()) {
+          int value = stepperMotorSettingsCharacteristics[i].value();
+          if(value > 0) {
+            // set max speed in RPM
+            StepperMotors[i]->setSpeed(value);
+            stepperMotorSettingsCharacteristics[i].setValue(0);
+            Serial.print("Set stepper max speed to ");
+            Serial.println(value);
+          } else if(value < 0) {
+            // set steps per rotation
+            // requires creating a new Adafruit_StepperMotor object
+            StepperMotors[i] = AFMS.getStepper(value, i + 1);
+            stepperMotorSettingsCharacteristics[i].setValue(0);
+            Serial.print("Set stepper steps per rotation to ");
+            Serial.println(value);
+          }
+        }
+
+        if(stepperMotorSpeedCharacteristics[i].written()) {
+          stepperMotorSpeeds[i] = stepperMotorSpeedCharacteristics[i].value();
         }
       }
       
-      if (motorSpeeds[0] > 255) {   //handle special case of stop command (slider1>255)
+      if (dcMotorSpeeds[0] > 255) {   //handle special case of stop command (slider1>255)
         Serial.println("Recieved all-off command");
         for(int i=0; i<NUM_DC_MOTORS; i++) {
-          motorSpeeds[i] = 0;
+          dcMotorSpeeds[i] = 0;
           dcMotorCharacteristics[i].setValue(0);
+        }
+        for(int i=0; i<NUM_STEPPER_MOTORS; i++) {
+          stepperMotorSpeeds[i] = 0;
+          stepperMotorSpeedCharacteristics[i].setValue(0);
         }
       }
 
-      if (handlenewval) {
+      if (updateDCMotors) {
         for(int i=0; i<NUM_DC_MOTORS; i++) {
-          if(motorSpeeds[i] > 255)
-            motorSpeeds[i] = 255;
-          else if(motorSpeeds[i] < -255)
-            motorSpeeds[i] = -255;
-          setDCMotorSpeed(DCMotors[i], motorSpeeds[i]);
+          if(dcMotorSpeeds[i] > 255)
+            dcMotorSpeeds[i] = 255;
+          else if(dcMotorSpeeds[i] < -255)
+            dcMotorSpeeds[i] = -255;
+          setDCMotorSpeed(DCMotors[i], dcMotorSpeeds[i]);
         }
 
-        handlenewval = false;
-      }  //if handle new val
+        updateDCMotors = false;
+      }
+
+      for(int i=0; i<NUM_STEPPER_MOTORS; i++) {
+        moveStepperMotor(StepperMotors[i], stepperMotorSpeeds[i]);
+      }
+      
       
     } // while  connected
 
@@ -146,12 +213,25 @@ void loop() {
 
 // special function to handle negative speeds correctly
 void setDCMotorSpeed(Adafruit_DCMotor * motor, int speed) {
-  if(speed < 0) {
+  if(speed == 0) {
+    motor->run(RELEASE);
+  } else if(speed < 0) {
     motor->run(BACKWARD);
     motor->setSpeed(-speed);
   } else {
     motor->run(FORWARD);
     motor->setSpeed(speed);
+  }
+}
+
+// special function to handle negative and zero values correctly
+void moveStepperMotor(Adafruit_StepperMotor * motor, int steps) {
+  if(steps == 0) {
+    motor->release();
+  } else if(steps < 0) {
+    motor->step(-steps, BACKWARD, SINGLE);
+  } else {
+    motor->step(steps, FORWARD, SINGLE);
   }
 }
 
