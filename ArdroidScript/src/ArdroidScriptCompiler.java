@@ -120,6 +120,8 @@ class ArdroidScriptCompiler {
 	    throw waitCommandException;
 	}
 	int millis = (int)(seconds * 1000);
+	if(millis < 0)
+	    throw new ScriptException("Wait times must be positive");
 	if(millis > 99999)
 	    throw new ScriptException("Wait times must be below 100 seconds");
 	return "w" + padInt(millis, 5);
@@ -262,6 +264,8 @@ class ArdroidScriptCompiler {
 	    throw timeModifierException;
 	}
 	int millis = (int)(seconds * 1000);
+	if(millis < 0)
+	    throw new ScriptException("Wait times must be positive");
 	if(millis > 99999)
 	    throw new ScriptException("Wait times must be below 100 seconds");
 	
@@ -272,7 +276,10 @@ class ArdroidScriptCompiler {
     }
 
     private String padInt(int n, int digits) {
-	return String.format("%0" + digits + "d", n);
+	if(n < 0)
+	    return "-" + String.format("%0" + (digits - 1) + "d", -n);
+	else
+	    return String.format("%0" + digits + "d", n);
     }
     
     private List<String> splitWords(String line) {
