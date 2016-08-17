@@ -155,15 +155,19 @@ void loop() {
             // set max speed in RPM
             StepperMotors[i]->setSpeed(value);
             stepperMotorSettingsCharacteristics[i].setValue(0);
-            Serial.print("Set stepper max speed to ");
+            Serial.print("Set stepper ");
+            Serial.print(i + 1);
+            Serial.print(" max speed to ");
             Serial.println(value);
           } else if(value < 0) {
             // set steps per rotation
             // requires creating a new Adafruit_StepperMotor object
-            StepperMotors[i] = AFMS.getStepper(value, i + 1);
+            StepperMotors[i] = AFMS.getStepper(-value, i + 1);
             stepperMotorSettingsCharacteristics[i].setValue(0);
-            Serial.print("Set stepper steps per rotation to ");
-            Serial.println(value);
+            Serial.print("Set stepper ");
+            Serial.print(i + 1);
+            Serial.print(" steps per rotation to ");
+            Serial.println(-value);
           }
         }
 
