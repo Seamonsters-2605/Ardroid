@@ -142,18 +142,23 @@ class ArdroidScriptCompiler {
 	    new ScriptException("Invalid stop command");
 	final ScriptException deviceException =
 	    new ScriptException("Invalid device in stop command");
+
+	String suffix = "";
+	if(hasTimeModifier(words)) {
+	    suffix = " " + getTimeModifierCommand(words);
+	}
 	
 
 	String secondWord;
 	switch(words.size()) {
 	case 1:
-	    return "x";
+	    return "x" + suffix;
 	case 2:
 	    secondWord = words.get(1);
 	    if(secondWord.equals("all"))
-		return "x";
+		return "x" + suffix;
 	    else if(secondWord.equals("driving"))
-		return "d0000 s0000"; // drive 0 steer 0
+		return "d0000 s0000" + suffix; // drive 0 steer 0
 	    else
 		throw stopCommandException;
 	case 4:
@@ -175,7 +180,7 @@ class ArdroidScriptCompiler {
 	    else
 		throw deviceException;
 
-	    return "v" + padInt(motorNumber, 2) + "0000"; 
+	    return "v" + padInt(motorNumber, 2) + "0000" + suffix; 
 	default:
 	    throw stopCommandException;
 	}
@@ -225,6 +230,45 @@ class ArdroidScriptCompiler {
 
     private int getStepperNumber(int port) {
 	return port + 50;
+    }
+
+    private boolean hasTimeModifier(List<String> words) throws ScriptException {
+	final ScriptException timeModifierException =
+	    new ScriptException("Invalid time modifier."
+				+ " Must be: for __ seconds");
+	int size = words.size();
+	if(size < 3)
+	    return false;
+	if(words.get(size - 3).equals("for")) {
+	    if(words.get(size - 1).equals("seconds"))
+		return true;
+	    else
+		throw timeModifierException;
+	} else {
+	    return false;
+	}
+    }
+
+    private String getTimeModifierCommand(List<String> words)
+	throws ScriptException {
+	final ScriptException timeModifierException =
+	    new ScriptException("Invalid time modifier."
+				+ " Must be: for __ seconds");
+
+	float seconds;
+	try {
+	    seconds = Float.parseFloat(words.get(words.size() - 2));
+	} catch (NumberFormatException e) {
+	    throw timeModifierException;
+	}
+	int millis = (int)(seconds * 1000);
+	if(millis > 99999)
+	    throw new ScriptException("Wait times must be below 100 seconds");
+	
+	for(int i = 0; i < 3; i++)
+	    words.remove(words.size() - 1);
+
+	return "w" + padInt(millis, 5);
     }
 
     private String padInt(int n, int digits) {
