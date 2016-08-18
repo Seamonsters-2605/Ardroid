@@ -1,6 +1,8 @@
 
 package ardroid;
 
+import java.util.*;
+
 import com.google.appinventor.components.runtime.*;
 import com.google.appinventor.components.annotations.DesignerComponent;
 import com.google.appinventor.components.annotations.DesignerProperty;
@@ -14,6 +16,7 @@ import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.common.YaVersion;
 
 import ardroid.ArdroidScriptCompiler;
+import ardroid.ArdroidScriptCompiler.ScriptException;
 
 
 @DesignerComponent(version = YaVersion.CLOCK_COMPONENT_VERSION,
@@ -23,11 +26,8 @@ import ardroid.ArdroidScriptCompiler;
 		   iconName = "images/ardroidScript.png")
 @SimpleObject(external = true)
 public final class ArdroidScriptCompilerComponent 
-    extends AndroidNonvisibleComponent
-    implements Component, OnStopListener, OnResumeListener, OnDestroyListener,
-	       Deleteable {
+    extends AndroidNonvisibleComponent implements Component, Deleteable {
     
-    private boolean onScreen = false;
     private ArdroidScriptCompiler compiler;
     private String error = "";
     private String compiledScript = "";
@@ -39,17 +39,6 @@ public final class ArdroidScriptCompilerComponent
      */
     public ArdroidScriptCompilerComponent(ComponentContainer container) {
 	super(container.$form());
-	// Set up listeners
-	form.registerForOnResume(this);
-	form.registerForOnStop(this);
-	form.registerForOnDestroy(this);
-
-	if (form instanceof ReplForm) {
-	    // In REPL, if this component was added to the project after the
-	    // onResume call occurred, then onScreen would be false, but the
-	    // REPL app is, in fact, on screen.
-	    onScreen = true;
-	}
 
 	compiler = new ArdroidScriptCompiler();
     }
@@ -60,47 +49,31 @@ public final class ArdroidScriptCompilerComponent
     }
   
     @SimpleProperty(category = PropertyCategory.BEHAVIOR, description ="")
-    public int GetCompiledScript() {
+    public String GetCompiledScript() {
 	return compiledScript;
     }
 
     @SimpleProperty(category = PropertyCategory.BEHAVIOR, description ="")
-    public int GetError() {
+    public String GetError() {
 	return error;
     }
 
     @SimpleProperty(category = PropertyCategory.BEHAVIOR, description ="")
-    public int GetScriptName() {
+    public String GetScriptName() {
 	return compiler.getScriptName();
     }
 
     @SimpleFunction (description = "")
-    public static boolean Compile(List<String> script) {
+    public boolean Compile(List<String> script) {
 	try {
 	    compiledScript = compiler.compile(script);
 	    error = "";
+	    return true;
 	} catch (ScriptException e) {
 	    error = e.getMessage();
+	    return false;
 	}
     }
 
-    @Override
-    public void onStop() {
-	onScreen = false;
-    }
-
-    @Override
-    public void onResume() {
-	onScreen = true;
-    }
-
-    @Override
-    public void onDestroy() {
-	timerInternal.Enabled(false);
-    }
-
-    @Override
-    public void onDelete() {
-	timerInternal.Enabled(false);
-    }
+    public void onDelete() { }
 }
