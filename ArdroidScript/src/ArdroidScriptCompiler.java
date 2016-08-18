@@ -137,7 +137,59 @@ class ArdroidScriptCompiler {
     }
 
     private String compileDrive(List<String> words) throws ScriptException {
-	return "";
+	final ScriptException turnCommandException =
+	    new ScriptException("Invalid drive command."
+				+ " Must be: drive forward/back/left/right");
+	int speed = DEFAULT_SPEED;
+	int driveSpeed = DEFAULT_SPEED;
+	int turnSpeed = 0;
+	String suffix = "";
+
+	boolean foundSomething = true;
+	while(foundSomething) {
+	    foundSomething = false;
+	    if(hasTimeModifier(words)) {
+		suffix = " " + getTimeModifierCommand(words) + " d0000 s0000";
+		foundSomething = true;
+	    }
+	    if(hasSpeedModifier(words)) {
+		speed = driveSpeed = getSpeedModifierValue(words);
+		foundSomething = false;
+	    }
+	}
+
+	List<String> directions = new ArrayList<>();
+	if(words.size() < 2) {
+	    throw turnCommandException;
+	} else {
+	    directions.add(words.get(1));
+	    if(words.size() == 2) {
+		; // do nothing
+	    } else if(words.size() == 4) {
+		if(!words.get(2).equals("and"))
+		    throw turnCommandException;
+		directions.add(words.get(3));
+	    } else {
+		throw turnCommandException;
+	    }
+	}
+	    
+	for(String direction : directions) {
+	    if(direction.equals("right")) {
+		turnSpeed = speed; // do nothing
+	    } else if(direction.equals("left")) {
+		turnSpeed = -speed;
+	    } else if(direction.equals("forward")) {
+		driveSpeed = speed;
+	    } else if(direction.equals("back")) {
+		driveSpeed = -speed;
+	    } else {
+		throw turnCommandException;
+	    }
+	}
+
+	return "d" + padInt(driveSpeed, 4) + "s" + padInt(turnSpeed, 4)
+	    + suffix;
     }
 
     private String compileTurn(List<String> words) throws ScriptException {
