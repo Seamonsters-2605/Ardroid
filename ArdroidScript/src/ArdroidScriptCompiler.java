@@ -188,7 +188,7 @@ class ArdroidScriptCompiler {
 	    }
 	}
 
-	return "d" + padInt(driveSpeed, 4) + "s" + padInt(turnSpeed, 4)
+	return "d" + padInt(driveSpeed, 4) + " s" + padInt(turnSpeed, 4)
 	    + suffix;
     }
 
@@ -231,10 +231,11 @@ class ArdroidScriptCompiler {
 	    new ScriptException("Invalid move command. Must be:"
 				+ " move dc/stepper motor __ forward/back");
 	
-	int motorNumber;
+	String deviceNumberString; // has device # and speed
 	boolean backward;
 	int speed = DEFAULT_SPEED;
 	String suffix = "";
+	boolean hasWait = false;
 	boolean hasRotations = false;
 	int milliRotations = 0;
 	boolean hasSteps = false;
@@ -244,7 +245,8 @@ class ArdroidScriptCompiler {
 	while(foundSomething) {
 	    foundSomething = false;
 	    if(hasTimeModifier(words)) {
-		suffix = " " + getTimeModifierCommand(words) + " s0000";
+		suffix = " " + getTimeModifierCommand(words);
+		hasWait = true;
 		foundSomething = true;
 	    }
 	    if(hasSpeedModifier(words)) {
@@ -268,6 +270,7 @@ class ArdroidScriptCompiler {
 	if(!words.get(2).equals("motor"))
 	    throw moveCommandException;
 	
+	int motorNumber;
 	try {
 	    motorNumber = Integer.parseInt(words.get(3));
 	} catch (NumberFormatException e) {
@@ -281,6 +284,11 @@ class ArdroidScriptCompiler {
 	    motorNumber = getStepperNumber(motorNumber);
 	else
 	    throw moveCommandException;
+	
+	deviceNumberString = padInt(motorNumber, 2);
+
+	if(hasWait)
+	    suffix += " v" + padInt(motorNumber, 2) + "0000";
 
 	String direction = words.get(4);
 	if(direction.equals("forward")) {
@@ -291,9 +299,21 @@ class ArdroidScriptCompiler {
 	    throw moveCommandException;
 	}
 
-	// construct command...
-
-	return "";
+	if(hasRotations) {
+	    if(backward)
+		milliRotations = -milliRotations;
+	    return "P" + deviceNumberString + padInt(speed, 3) 
+		+ padInt(milliRotations, 7) + suffix;
+	} else if(hasSteps) {
+	    if(backward)
+		steps = -steps;
+	    return "p" + deviceNumberString + padInt(speed, 3) 
+		+ padInt(steps, 7) + suffix;
+	} else {
+	    if(backward)
+		speed = -speed;
+	    return "v" + deviceNumberString + padInt(speed, 4) + suffix;
+	}
     }
 
     private String compileStop(List<String> words) throws ScriptException {
