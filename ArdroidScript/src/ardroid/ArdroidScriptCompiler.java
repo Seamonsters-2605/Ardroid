@@ -1,3 +1,5 @@
+package ardroid;
+
 import java.io.*;
 import java.util.*;
 
@@ -19,7 +21,7 @@ class ArdroidScriptCompiler {
     public static void main(String[] args) {
 	BufferedReader in =
 	    new BufferedReader(new InputStreamReader(System.in));
-	List<String> script = new ArrayList<>();
+	List<String> script = new ArrayList<String>();
 	String line;
 	try {
 	    while((line = in.readLine()) != null) {
@@ -158,7 +160,7 @@ class ArdroidScriptCompiler {
 	    }
 	}
 
-	List<String> directions = new ArrayList<>();
+	List<String> directions = new ArrayList<String>();
 	if(words.size() < 2) {
 	    throw turnCommandException;
 	} else {
@@ -564,7 +566,7 @@ class ArdroidScriptCompiler {
     
     private List<String> splitWords(String line) {
 	String[] words = line.trim().split("[ \t]");
-	List<String> wordsList = new ArrayList<>();
+	List<String> wordsList = new ArrayList<String>();
 	for(String w : words) {
 	    if(!w.isEmpty())
 		wordsList.add(w);
