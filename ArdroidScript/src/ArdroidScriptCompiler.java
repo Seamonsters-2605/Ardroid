@@ -412,6 +412,63 @@ class ArdroidScriptCompiler {
 	}
     }
 
+    private boolean hasRotationsModifier(List<String> words) {
+	return words.get(words.size() - 1).equals("rotations");
+    }
+
+    private int getRotationsModifierValue(List<String> words)
+	throws ScriptException {
+	words.remove(words.size() - 1);
+	String numberString = words.get(words.size() - 1);
+	words.remove(words.size() - 1);
+
+	float rotations;
+	try {
+	    rotations = Float.parseFloat(numberString);
+	} catch (NumberFormatException e) {
+	    throw new ScriptException("Invalid rotations modifier."
+				      + "Must be: __ rotations");
+	}
+	int value = (int)(rotations * 1000);
+	if(value < 0)
+	    throw new ScriptException("Number of rotations must be positive."
+				      + " Type \"move back __ rotations\""
+				      + " to move the motor backwards.");
+	if(value > 999999)
+	    throw new ScriptException("Number of rotations must be less than"
+				      + " 1000.");
+	return value;
+    }
+
+    private boolean hasStepsModifier(List<String> words)
+	throws ScriptException {
+	return words.get(words.size() - 1).equals("steps");
+    }
+    
+    private int getStepsModifierValue(List<String> words)
+	throws ScriptException {
+	words.remove(words.size() - 1);
+	String numberString = words.get(words.size() - 1);
+	words.remove(words.size() - 1);
+
+	float stepsF;
+	try {
+	    stepsF = Float.parseFloat(numberString);
+	} catch (NumberFormatException e) {
+	    throw new ScriptException("Invalid steps modifier."
+				      + "Must be: __ steps");
+	}
+	int steps = (int)stepsF;
+	if(steps < 0)
+	    throw new ScriptException("Number of steps must be positive."
+				      + " Type \"move back __ steps\""
+				      + " to move the motor backwards.");
+	if(steps > 999999)
+	    throw new ScriptException("Number of steps must be less than"
+				      + " 1,000,000.");
+	return steps;
+    }
+
     private String padInt(int n, int digits) {
 	if(n < 0)
 	    return "-" + String.format("%0" + (digits - 1) + "d", -n);
