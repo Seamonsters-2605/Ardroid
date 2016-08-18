@@ -3,6 +3,13 @@ import java.util.*;
 
 class ArdroidScriptCompiler {
 
+    private static final int DEFAULT_SPEED = 191;
+    private static final int MAX_SPEED = 255;
+    private static final int VERY_SLOW_SPEED = 63;
+    private static final int SLOW_SPEED = 127;
+    private static final int FAST_SPEED = 191;
+    private static final int VERY_FAST_SPEED = 255;
+
     public class ScriptException extends Exception {
 	public ScriptException(String message) {
 	    super(message);
@@ -49,6 +56,8 @@ class ArdroidScriptCompiler {
 	    } catch(ScriptException e) {
 		throw new ScriptException("Error with line: " + line + "\n"
 					  + e.getMessage());
+	    } catch(Exception e) {
+		throw new ScriptException("Unexpected error while compiling!");
 	    }
 	}
 
@@ -132,7 +141,37 @@ class ArdroidScriptCompiler {
     }
 
     private String compileTurn(List<String> words) throws ScriptException {
-	return "";
+	final ScriptException turnCommandException =
+	    new ScriptException("Invalid turn command."
+				+ " Must be: turn left/right");
+	int speed = DEFAULT_SPEED;
+	String suffix = "";
+
+	boolean foundSomething = true;
+	while(foundSomething) {
+	    foundSomething = false;
+	    if(hasTimeModifier(words)) {
+		suffix = " " + getTimeModifierCommand(words) + " s0000";
+		foundSomething = true;
+	    }
+	    if(hasSpeedModifier(words)) {
+		speed = getSpeedModifierValue(words);
+		foundSomething = false;
+	    }
+	}
+
+	if(words.size() != 2)
+	    throw turnCommandException;
+	String direction = words.get(1);
+	if(direction.equals("right")) {
+	    ; // do nothing
+	} else if(direction.equals("left")) {
+	    speed = -speed;
+	} else {
+	    throw turnCommandException;
+	}
+
+	return "s" + padInt(speed, 4) + suffix;
     }
 
     private String compileMove(List<String> words) throws ScriptException {
@@ -273,6 +312,52 @@ class ArdroidScriptCompiler {
 	    words.remove(words.size() - 1);
 
 	return "w" + padInt(millis, 5);
+    }
+
+    private boolean hasSpeedModifier(List<String> words) throws ScriptException{
+	String last = words.get(words.size() - 1);
+	if(last.endsWith("%")) {
+	    if(!words.get(words.size() - 2).equals("at"))
+		throw new ScriptException("Invalid speed modifier."
+					  + " Must be: at __%");
+	    else
+		return true;
+	}
+	return last.equals("slow") || last.equals("fast");
+    }
+
+    private int getSpeedModifierValue(List<String> words)throws ScriptException{
+	String last = words.get(words.size() - 1);
+	words.remove(words.size() - 1);
+	String secondToLast = words.get(words.size() - 1);
+	boolean hasVery = false;
+	if(secondToLast.equals("very")) {
+	    words.remove(words.size() - 1);
+	    hasVery = true;
+	}
+	if(secondToLast.equals("at")) {
+	    words.remove(words.size() - 1);
+	}
+
+	if(last.equals("fast")) {
+	    return hasVery ? VERY_FAST_SPEED : FAST_SPEED;
+	} else if(last.equals("slow")) {
+	    return hasVery ? VERY_SLOW_SPEED : SLOW_SPEED;
+	} else if(last.endsWith("%")) {
+	    float percent;
+	    try {
+		percent = Float.parseFloat(last.substring(0, last.length()-1));
+	    } catch (NumberFormatException e) {
+		throw new ScriptException("Invalid speed modifier."
+					  + " Must be: at __%");
+	    }
+	    if(percent < 0 || percent > 100)
+		throw new ScriptException("Speed must be between 0 and 100%");
+	    return (int)(percent * (float)MAX_SPEED / 100.0);
+	} else {
+	    throw new ScriptException("Unexpected error parsing speed modifier."
+				      );
+	}
     }
 
     private String padInt(int n, int digits) {
