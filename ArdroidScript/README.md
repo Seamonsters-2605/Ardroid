@@ -7,6 +7,7 @@ The script editor is a work in progress and is currently hidden from the interfa
 - Tap `Open Screen`
 - Type `ScriptScreen` with correct capitalization and no spaces in the box
 - Tap `Confirm`
+
 Currently it is only an editor, and cannot compile or run code.
 
 This directory has the unfinished "compiler" for the language. It is written in Java and will eventually be added to the app as an App Inventor extension.
