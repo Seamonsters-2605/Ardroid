@@ -154,7 +154,7 @@ class ArdroidScriptCompiler {
 	    }
 	    if(hasSpeedModifier(words)) {
 		speed = driveSpeed = getSpeedModifierValue(words);
-		foundSomething = false;
+		foundSomething = true;
 	    }
 	}
 
@@ -208,7 +208,7 @@ class ArdroidScriptCompiler {
 	    }
 	    if(hasSpeedModifier(words)) {
 		speed = getSpeedModifierValue(words);
-		foundSomething = false;
+		foundSomething = true;
 	    }
 	}
 
@@ -227,6 +227,72 @@ class ArdroidScriptCompiler {
     }
 
     private String compileMove(List<String> words) throws ScriptException {
+	final ScriptException moveCommandException =
+	    new ScriptException("Invalid move command. Must be:"
+				+ " move dc/stepper motor __ forward/back");
+	
+	int motorNumber;
+	boolean backward;
+	int speed = DEFAULT_SPEED;
+	String suffix = "";
+	boolean hasRotations = false;
+	int milliRotations = 0;
+	boolean hasSteps = false;
+	int steps = 0;
+
+	boolean foundSomething = true;
+	while(foundSomething) {
+	    foundSomething = false;
+	    if(hasTimeModifier(words)) {
+		suffix = " " + getTimeModifierCommand(words) + " s0000";
+		foundSomething = true;
+	    }
+	    if(hasSpeedModifier(words)) {
+		speed = getSpeedModifierValue(words);
+		foundSomething = true;
+	    }
+	    if(hasRotationsModifier(words)) {
+		hasRotations = true;
+		milliRotations = getRotationsModifierValue(words);
+		foundSomething = true;
+	    }
+	    if(hasStepsModifier(words)) {
+		hasSteps = true;
+		steps = getStepsModifierValue(words);
+		foundSomething = true;
+	    }
+	}
+
+	if(words.size() != 5)
+	    throw moveCommandException;
+	if(!words.get(2).equals("motor"))
+	    throw moveCommandException;
+	
+	try {
+	    motorNumber = Integer.parseInt(words.get(3));
+	} catch (NumberFormatException e) {
+	    throw moveCommandException;
+	}
+
+	String motorType = words.get(1);
+	if(motorType.equals("dc"))
+	    motorNumber = getDCNumber(motorNumber);
+	else if(motorType.equals("stepper"))
+	    motorNumber = getStepperNumber(motorNumber);
+	else
+	    throw moveCommandException;
+
+	String direction = words.get(4);
+	if(direction.equals("forward")) {
+	    backward = false;
+	} else if(direction.equals("back")) {
+	    backward = true;
+	} else {
+	    throw moveCommandException;
+	}
+
+	// construct command...
+
 	return "";
     }
 
@@ -234,20 +300,20 @@ class ArdroidScriptCompiler {
 	final ScriptException stopCommandException =
 	    new ScriptException("Invalid stop command");
 	final ScriptException deviceException =
-	    new ScriptException("Invalid device in stop command");
+	    new ScriptException("Invalid device in stop command."
+				+ " Must be: stop dc/stepper motor __");
 
 	String suffix = "";
 	if(hasTimeModifier(words)) {
 	    suffix = " " + getTimeModifierCommand(words);
 	}
 	
-
-	String secondWord;
+	
 	switch(words.size()) {
 	case 1:
 	    return "x" + suffix;
 	case 2:
-	    secondWord = words.get(1);
+	    String secondWord = words.get(1);
 	    if(secondWord.equals("all"))
 		return "x" + suffix;
 	    else if(secondWord.equals("driving"))
@@ -265,10 +331,10 @@ class ArdroidScriptCompiler {
 		throw deviceException;
 	    }
 
-	    secondWord = words.get(1);
-	    if(secondWord.equals("dc"))
+	    String motorType = words.get(1);
+	    if(motorType.equals("dc"))
 		motorNumber = getDCNumber(motorNumber);
-	    else if(secondWord.equals("stepper"))
+	    else if(motorType.equals("stepper"))
 		motorNumber = getStepperNumber(motorNumber);
 	    else
 		throw deviceException;
