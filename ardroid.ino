@@ -231,7 +231,7 @@ void setDCMotorSpeed(Adafruit_DCMotor * motor, int speed) {
 // special function to handle negative and zero values correctly
 void moveStepperMotor(Adafruit_StepperMotor * motor, int steps) {
   if(steps == 0) {
-    motor->release();
+    ; // do nothing
   } else if(steps < 0) {
     motor->step(-steps, BACKWARD, SINGLE);
   } else {

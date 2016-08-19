@@ -75,6 +75,11 @@ public final class ArdroidScriptCompilerComponent
 	} catch (ScriptException e) {
 	    error = e.getMessage();
 	    return false;
+        } catch (Exception e) {
+	    error = "";
+	    for(StackTraceElement element : e.getStackTrace())
+		error += element.toString() + "\n";
+	    return false;
 	}
     }
 

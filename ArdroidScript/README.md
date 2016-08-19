@@ -6,8 +6,8 @@ The script editor is a work in progress and is currently hidden from the interfa
 - Choose `Yes` for the warning message
 - Tap `Open Screen`
 - Type `ScriptScreen` with correct capitalization and no spaces in the box
-- Tap `Confirm`
+- Tap `OK`
 
-Currently the editor is finished but the app cannot compile or run code.
+Currently the editor and compiler is finished but the app run compiled code.
 
 This directory has the "compiler" for the language. It is written in Java as an extension to App Inventor. The compiled extension is in the root directory: `ardroid.ArdroidScriptCompilerComponent.aix`
