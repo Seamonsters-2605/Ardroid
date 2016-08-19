@@ -10,4 +10,4 @@ The script editor is a work in progress and is currently hidden from the interfa
 
 Currently the editor is finished but the app cannot compile or run code.
 
-This directory has the "compiler" for the language. It is written in Java and will eventually be added to the app as an App Inventor extension.
+This directory has the "compiler" for the language. It is written in Java as an extension to App Inventor. The compiled extension is in the root directory: `ardroid.ArdroidScriptCompilerComponent.aix`
