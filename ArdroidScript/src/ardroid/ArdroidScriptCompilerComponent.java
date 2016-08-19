@@ -14,6 +14,7 @@ import com.google.appinventor.components.annotations.SimpleProperty;
 import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.common.YaVersion;
+import com.google.appinventor.components.runtime.util.YailList;
 
 import ardroid.ArdroidScriptCompiler;
 import ardroid.ArdroidScriptCompiler.ScriptException;
@@ -48,25 +49,27 @@ public final class ArdroidScriptCompilerComponent
 	super(null);
     }
   
-    @SimpleProperty(category = PropertyCategory.BEHAVIOR, description ="")
+    @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "")
     public String GetCompiledScript() {
 	return compiledScript;
     }
 
-    @SimpleProperty(category = PropertyCategory.BEHAVIOR, description ="")
+    @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "")
     public String GetError() {
 	return error;
     }
 
-    @SimpleProperty(category = PropertyCategory.BEHAVIOR, description ="")
+    @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "")
     public String GetScriptName() {
 	return compiler.getScriptName();
     }
 
-    @SimpleFunction (description = "")
-    public boolean Compile(List<String> script) {
+    @SimpleFunction
+    public boolean Compile(YailList script) {
 	try {
-	    compiledScript = compiler.compile(script);
+	    String[] scriptArray = script.toStringArray();
+	    List<String> scriptList = Arrays.asList(scriptArray);
+	    compiledScript = compiler.compile(scriptList);
 	    error = "";
 	    return true;
 	} catch (ScriptException e) {
