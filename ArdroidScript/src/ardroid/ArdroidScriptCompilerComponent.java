@@ -23,7 +23,7 @@ import ardroid.ArdroidScriptCompiler.ScriptException;
 		   description = "Compiler for ArdroidScript",
 		   category = ComponentCategory.EXTENSION,
 		   nonVisible = true,
-		   iconName = "images/ardroidScript.png")
+		   iconName = "images/extension.png")
 @SimpleObject(external = true)
 public final class ArdroidScriptCompilerComponent 
     extends AndroidNonvisibleComponent implements Component, Deleteable {
