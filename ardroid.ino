@@ -136,6 +136,7 @@ void loop() {
 
     int dcMotorSpeeds[NUM_DC_MOTORS] = {0,0,0,0};
     int stepperMotorSpeeds[NUM_STEPPER_MOTORS] = {0,0};
+    float stepperMotorAccumulators[NUM_STEPPER_MOTORS] = {0.0, 0.0};
     bool updateDCMotors = false;
 
     // while the central is still connected to peripheral:
@@ -174,7 +175,8 @@ void loop() {
         }
 
         if(stepperMotorSpeedCharacteristics[i].written()) {
-          stepperMotorSpeeds[i] = stepperMotorSpeedCharacteristics[i].value();
+          int value = stepperMotorSpeedCharacteristics[i].value();
+          stepperMotorSpeeds[i] = value;
         }
       }
       
@@ -203,10 +205,23 @@ void loop() {
       }
 
       for(int i=0; i<NUM_STEPPER_MOTORS; i++) {
-        moveStepperMotor(StepperMotors[i], (int)((float)stepperMotorSpeeds[i] * (float)timeDiff / 1000.0));
+        stepperMotorAccumulators[i] += (float)stepperMotorSpeeds[i] * (float)timeDiff / 1000.0;
+        float movement = stepperMotorAccumulators[i];
+        if(movement > 1.0) {
+          int steps = (int)movement;
+          stepperMotorAccumulators[i] -= steps;
+          moveStepperMotor(StepperMotors[i], steps);
+        }
+        if(movement < 1.0) {
+          int steps = -(int)(-movement);
+          stepperMotorAccumulators[i] -= steps;
+          moveStepperMotor(StepperMotors[i], steps);
+        }
       }
 
       timeDiff = millis() - lastMillis;
+      if(timeDiff > 200)
+        timeDiff = 200; // too high values cause problems
       lastMillis = millis();
     } // while  connected
 
@@ -236,9 +251,11 @@ void moveStepperMotor(Adafruit_StepperMotor * motor, int steps) {
   if(steps == 0) {
     ; // do nothing
   } else if(steps < 0) {
-    motor->step(-steps, BACKWARD, SINGLE);
+    for(int i = 0; i < -steps; i++)
+      motor->onestep(BACKWARD, SINGLE);
   } else {
-    motor->step(steps, FORWARD, SINGLE);
+    for(int i = 0; i < steps; i++)
+      motor->onestep(FORWARD, SINGLE);
   }
 }
 
