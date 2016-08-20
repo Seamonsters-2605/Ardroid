@@ -139,6 +139,8 @@ void loop() {
     bool updateDCMotors = false;
 
     // while the central is still connected to peripheral:
+    unsigned long lastMillis = millis();
+    unsigned long timeDiff = 0;
     while (central.connected()) {
       
       for(int i=0; i<NUM_DC_MOTORS; i++) {
@@ -201,10 +203,11 @@ void loop() {
       }
 
       for(int i=0; i<NUM_STEPPER_MOTORS; i++) {
-        moveStepperMotor(StepperMotors[i], stepperMotorSpeeds[i]);
+        moveStepperMotor(StepperMotors[i], (int)((float)stepperMotorSpeeds[i] * (float)timeDiff / 1000.0));
       }
-      
-      
+
+      timeDiff = millis() - lastMillis;
+      lastMillis = millis();
     } // while  connected
 
     // when the central disconnects, print it out:
