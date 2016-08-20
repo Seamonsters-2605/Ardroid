@@ -44,7 +44,7 @@ describes 3 tags, called `tag1`, `tag2.tag3` and `tag2.tag4`.
     - `dScale`
     - `s1port`: Steering stepper motor (only 1)
     - `s1reverse`
-    - `sScale`: Max speed scale, 0 - 1
+    - `sScale`: Max speed scale, 0 - 1. Multiply by 500 to find RPM.
     - `sSteps`: Number of steps per rotation
     - `sRotations`: Rotations to fully steer to the right or left
   - `numControls`: Number of custom controls, usually 4.
