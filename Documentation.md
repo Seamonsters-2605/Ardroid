@@ -10,7 +10,7 @@
 - 07 - 08: Stepper motors
   - -65535 - 65535: Move steps
 - 09 - 0A: Stepper motors
-  - -65535 - 65535: Set speed
+  - -65535 - 65535: Set speed in steps per second
   
 ## TinyDB Tags
 TinyDB is used internally by the app to store data.
