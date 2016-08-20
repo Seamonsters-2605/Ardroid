@@ -6,7 +6,8 @@ This directory has the "compiler" for the language. It is written in Java as an 
 See `Documentation.md` for a description of the syntax, and the intermediate compiled form.
 
 The script editor is a work in progress and is currently hidden from the interface. To access it in the app:
-- Tap `Dev Tools` on the main screen
+- On the main screen, tap the box in the lower left corner
+- Tap the `Dev Tools` button in the lower right corner
 - Choose `Yes` for the warning message
 - Tap `Open Screen`
 - Type `ScriptScreen` with correct capitalization and no spaces in the box
