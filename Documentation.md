@@ -1,15 +1,16 @@
 # Ardroid app documentation
 
 ## Bluetooth LE Characteristics
-- 01 - 04: DC motors
+19B2000X-E8F2-537E-4F6C-D104768A1214
+- 1 - 4: DC motors
   - -255 - 255: Set speed
   - Set 01 to 256 for All Off signal.
-- 05 - 06: Stepper motors
+- 5 - 6: Stepper motors
   - 0 - 65535: Set max speed in RPM
   - -65536 - 0: Set steps per rotation
-- 07 - 08: Stepper motors
+- 7 - 8: Stepper motors
   - -65535 - 65535: Set position, 0 centered
-- 09 - 0A: Stepper motors
+- 9 - A: Stepper motors
   - -65535 - 65535: Set speed in steps per second
   
 ## TinyDB Tags
