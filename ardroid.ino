@@ -134,9 +134,19 @@ void loop() {
     // print the central's MAC address:
     Serial.println(central.address());
 
-    int dcMotorSpeeds[NUM_DC_MOTORS] = {0,0,0,0};
-    int stepperMotorSpeeds[NUM_STEPPER_MOTORS] = {0,0};
-    float stepperMotorAccumulators[NUM_STEPPER_MOTORS] = {0.0, 0.0};
+    int dcMotorSpeeds[NUM_DC_MOTORS];
+    for(int i = 0; i < NUM_DC_MOTORS; i++)
+      dcMotorSpeeds[i] = 0;
+    int stepperMotorSpeeds[NUM_STEPPER_MOTORS];
+    float stepperMotorAccumulators[NUM_STEPPER_MOTORS];
+    int stepperMotorTargetPositions[NUM_STEPPER_MOTORS];
+    int stepperMotorCurrentPositions[NUM_STEPPER_MOTORS];
+    for(int i = 0; i < NUM_STEPPER_MOTORS; i++) {
+      stepperMotorSpeeds[i] = 0;
+      stepperMotorAccumulators[i] = 0;
+      stepperMotorTargetPositions[i] = 0;
+      stepperMotorCurrentPositions[i] = 0;
+    }
     bool updateDCMotors = false;
 
     // while the central is still connected to peripheral:
@@ -174,9 +184,12 @@ void loop() {
           }
         }
 
+        if(stepperMotorPositionCharacteristics[i].written()) {
+          stepperMotorTargetPositions[i] = stepperMotorPositionCharacteristics[i].value();
+        }
+
         if(stepperMotorSpeedCharacteristics[i].written()) {
-          int value = stepperMotorSpeedCharacteristics[i].value();
-          stepperMotorSpeeds[i] = value;
+          stepperMotorSpeeds[i] = stepperMotorSpeedCharacteristics[i].value();
         }
       }
       
@@ -189,6 +202,8 @@ void loop() {
         for(int i=0; i<NUM_STEPPER_MOTORS; i++) {
           stepperMotorSpeeds[i] = 0;
           stepperMotorSpeedCharacteristics[i].setValue(0);
+          stepperMotorTargetPositions[i] = stepperMotorCurrentPositions[i];
+          stepperMotorPositionCharacteristics[i].setValue(stepperMotorTargetPositions[i]);
         }
       }
 
@@ -205,6 +220,13 @@ void loop() {
       }
 
       for(int i=0; i<NUM_STEPPER_MOTORS; i++) {
+        // position mode
+        if(stepperMotorTargetPositions[i] != stepperMotorCurrentPositions[i]) {
+          moveStepperMotor(StepperMotors[i], stepperMotorTargetPositions[i] - stepperMotorCurrentPositions[i]);
+          stepperMotorCurrentPositions[i] = stepperMotorTargetPositions[i];
+        }
+
+        // speed mode
         stepperMotorAccumulators[i] += (float)stepperMotorSpeeds[i] * (float)timeDiff / 1000.0;
         float movement = stepperMotorAccumulators[i];
         if(movement > 1.0) {
@@ -251,11 +273,9 @@ void moveStepperMotor(Adafruit_StepperMotor * motor, int steps) {
   if(steps == 0) {
     ; // do nothing
   } else if(steps < 0) {
-    for(int i = 0; i < -steps; i++)
-      motor->onestep(BACKWARD, SINGLE);
+    motor->step(-steps, BACKWARD, SINGLE);
   } else {
-    for(int i = 0; i < steps; i++)
-      motor->onestep(FORWARD, SINGLE);
+    motor->step(steps, FORWARD, SINGLE);
   }
 }
 
