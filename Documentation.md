@@ -28,14 +28,14 @@ describes 3 tags, called `tag1`, `tag2.tag3` and `tag2.tag4`.
   - driveMode: Can be "None", "Tank", or "Steer". Presence of this tag is used to determine if settings screen has been opened.
   - tank
     - l1port: Port number for left motor 1
-    - l1reverse: Boolean
+    - l1reverse: Boolean: reverse direction?
     - l2port
     - l2reverse
     - r1port
     - r1reverse
     - r2port
     - r2reverse
-    - scale: 0 to 1 speed scale
+    - scale: Max speed scale, 0 to 1
   - steer
     - d1port: Drive motors
     - d1reverse
@@ -44,7 +44,7 @@ describes 3 tags, called `tag1`, `tag2.tag3` and `tag2.tag4`.
     - dScale
     - s1port: Steering stepper motor (only 1)
     - s1reverse
-    - sScale: 0 - 1. Max speed
+    - sScale: Max speed scale, 0 - 1
     - sSteps: Number of steps per rotation
     - sRotations: Rotations to fully steer to the right or left
   - numControls: Number of custom controls, usually 4.
@@ -56,10 +56,10 @@ describes 3 tags, called `tag1`, `tag2.tag3` and `tag2.tag4`.
     - m2port
     - m2reverse
     - dc
-      - scale
+      - scale: Max speed scale, 0 to 1
     - stepper
-      - steps: Steps per rotation
-      - scale: Max speed, 0 to 1
+      - steps: Number of steps per rotation
+      - scale: Max speed scale, 0 to 1
       - position
         - fRotations: Rotations available forward from starting position
         - bRotations: Backward
