@@ -5,6 +5,7 @@ There are two parts to this: an Android app, written with MIT App Inventor 2, se
 
 ## To do:
 This is a work in progress.
-- Control stepper motors
 - Steer drive
-- Run scripts
+- Create/edit/run scripts
+- Accelerometer control
+- Allow stacked motor shields
