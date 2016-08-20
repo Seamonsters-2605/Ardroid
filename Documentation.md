@@ -8,7 +8,7 @@
   - 0 - 65535: Set max speed in RPM
   - -65536 - 0: Set steps per rotation
 - 07 - 08: Stepper motors
-  - -65535 - 65535: Move steps
+  - -65535 - 65535: Set position, 0 centered
 - 09 - 0A: Stepper motors
   - -65535 - 65535: Set speed in steps per second
   
