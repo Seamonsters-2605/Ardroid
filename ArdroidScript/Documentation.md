@@ -15,7 +15,7 @@ Brackets represent optional sections.
 - `turn left/right`
   - `(speed)`
   - `for (number) seconds`
-- `move (device) forward/back
+- `move (device) forward/back`
   - `(speed)`
   - One of these:
     - `for (number) seconds`
