@@ -25,6 +25,7 @@ describes 3 tags, called `tag1`, `tag2.tag3` and `tag2.tag4`.
 
 - `addr`: Address of selected device. Temporary.
 - `selectedControl`: Index of selected control to configure, starting at 1. Temporary.
+- `selectedScript`: Script number to edit. Temporary.
 - `config.`
   - `driveMode`: Can be `None`, `Tank`, or `Steer`. Presence of this tag is used to determine if settings screen has been opened.
   - `tank.`
