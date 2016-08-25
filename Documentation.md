@@ -67,6 +67,6 @@ describes 3 tags, called `tag1`, `tag2.tag3` and `tag2.tag4`.
         - `bRotations`: Backward
   - `scripts`: List of script numbers as CSV
   - `script1.`, `script2.`, etc.
-    - `source`: The source code of the script, as a list of lines
+    - `source`: The source code of the script, as a CSV list of lines
     - `name`: The name of the script
     - `compiled`: The compiled form of the script
