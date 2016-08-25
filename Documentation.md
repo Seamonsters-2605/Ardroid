@@ -65,8 +65,22 @@ describes 3 tags, called `tag1`, `tag2.tag3` and `tag2.tag4`.
       - `position.`
         - `fRotations`: Rotations available forward from starting position
         - `bRotations`: Backward
-  - `scripts`: List of script numbers
-  - `script1.`, `script2.`, etc.
+  - `scripts`: List of script numbers. Scripts are assigned a random number when they are created.
+  - `script1234.`, `script5678.`, etc. for each script number
     - `source`: The source code of the script, as a CSV list of lines
     - `name`: The name of the script
     - `compiled`: The compiled form of the script
+
+## App Screens
+App Inventor divides apps into Screens, which have limited communication between each other (temporary TinyDB tags are used for this).
+- `Screen1`: The main, initial app screen, with 2 buttons to Scan for Bots and adjust Bot Settings. Swiping to the left at the bottom of this screen reveals a button to go to Dev Tools (`ResetScreen`).
+- `ControlScreen`: The remote control screen for the bot. On startup it creates custom controls, connects to the bot and sends settings over bluetooth. It has sliders and accelerometer control for driving and moving motors, and is able to run scripts.
+- `ConfigScreen`: The main settings screen, with options to configure drive mode and driving options, and to edit custom controls or scripts using other screens.
+- `ControlConfigScreen`: Settings for the custom control specified by the tag `selectedControl`.
+- `ScriptScreen`: The script editor. Loads and saves from the script specified by the tag `selectedScript`. Before closing the script is compiled - if there are errors, the screen cannot be closed until it is fixed and compiled correctly.
+- `ResetScreen`: The Developer Tools screen. Options on this screen:
+  - `Reset App`: Delete all TinyDB tags. This will remove all bot configuration.
+  - `Open Screen`: Enter the name of a screen to open.
+  - `About`: About the app.
+  - `Get All Tags`: Display all TinyDB tags and values in a list below. The list will not be updated until this button is pressed again. Tapping the list does nothing.
+  - `Edit Tag`: Enter the new value for a tag.
