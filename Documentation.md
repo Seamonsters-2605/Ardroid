@@ -65,7 +65,7 @@ describes 3 tags, called `tag1`, `tag2.tag3` and `tag2.tag4`.
       - `position.`
         - `fRotations`: Rotations available forward from starting position
         - `bRotations`: Backward
-  - `scripts`: List of script numbers as CSV
+  - `scripts`: List of script numbers
   - `script1.`, `script2.`, etc.
     - `source`: The source code of the script, as a CSV list of lines
     - `name`: The name of the script
