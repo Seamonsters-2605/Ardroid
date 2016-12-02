@@ -73,7 +73,8 @@ describes 3 tags, called `tag1`, `tag2.tag3` and `tag2.tag4`.
 
 ## App Screens
 App Inventor divides apps into Screens, which have limited communication between each other (temporary TinyDB tags are used for this).
-- `Screen1`: The main, initial app screen, with 2 buttons to Scan for Bots and adjust Bot Settings. Swiping to the left at the bottom of this screen reveals a button to go to Dev Tools (`ResetScreen`).
+- `Screen1`: The main, initial app screen, with 3 buttons to Scan for Bots, adjust Bot Settings, and get Help. Swiping to the left at the bottom of this screen reveals a button to go to Dev Tools (`ResetScreen`).
+- `HelpScreen`: Has information about the app.
 - `ControlScreen`: The remote control screen for the bot. On startup it creates custom controls, connects to the bot and sends settings over bluetooth. It has sliders and accelerometer control for driving and moving motors, and is able to run scripts.
 - `ConfigScreen`: The main settings screen, with options to configure drive mode and driving options, and to edit custom controls or scripts using other screens.
 - `ControlConfigScreen`: Settings for the custom control specified by the tag `selectedControl`.
