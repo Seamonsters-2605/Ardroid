@@ -9,6 +9,7 @@ There are two parts to this: an Android app, written with MIT App Inventor 2, se
 - Go to Tools Menu > Board > Boards Manager... and install "Intel Curie Boards."
 - Go to Sketch > Include Library > Manage Libraries... and install "Adafruit Motor Shield V2 Library."
 - If you are on Linux, open a terminal and run:
+    
     ```
     cd ~/.arduino15/packages/Intel/tools/arduino101load/1.6.9+1.28/scripts
     sudo ./create_dfu_udev_rule
