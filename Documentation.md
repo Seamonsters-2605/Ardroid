@@ -82,6 +82,5 @@ App Inventor divides apps into Screens, which have limited communication between
 - `ResetScreen`: The Developer Tools screen. To open this screen, go to the Help page, long-press on the Close button, then scroll to the bottom of the page and there will be a "Dev Tools" button. Press this button and choose "Yes." Options on this screen:
   - `Reset App`: Delete all TinyDB tags. This will remove all bot configuration.
   - `Open Screen`: Enter the name of a screen to open.
-  - `About`: About the app.
   - `Get All Tags`: Display all TinyDB tags and values in a list below. The list will not be updated until this button is pressed again. Tapping the list does nothing.
   - `Edit Tag`: Enter the new value for a tag.
