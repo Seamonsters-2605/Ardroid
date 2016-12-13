@@ -3,6 +3,8 @@ A generic robot controller for the Arduino101 board with an Adafruit v2 motor sh
 
 There are two parts to this: an Android app, written with MIT App Inventor 2, serving as a remote control for the robot; and an Arduino sketch that receives signals from the controller over Bluetooth and moves motors accordingly. The app allows customization of the controls for moving motors and for driving. It also has a rudimentary scripting language; see the `ArdroidScript` directory.
 
+The app is on the Google Play store! Search "ardroid robot controller seamonsters".
+
 ## Arduino Sketch Installation Instructions
 - Download the [Arduino IDE](https://www.arduino.cc/en/Main/Software)
 - Download the `ardroid.ino` file from this repository. It must be in a folder called `ardroid` (all lowercase).
