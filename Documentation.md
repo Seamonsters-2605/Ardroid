@@ -1,7 +1,10 @@
 # Ardroid app documentation
 
 ## Bluetooth LE Characteristics
-19B2000X-E8F2-537E-4F6C-D104768A1214
+19B200XX-E8F2-537E-4F6C-D104768A1214
+
+Prefix these with the shield number (up to 16 shields).
+
 - 1 - 4: DC motors
   - -255 - 255: Set speed
   - Set 01 to 256 for All Off signal.
