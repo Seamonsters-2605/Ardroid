@@ -8,7 +8,9 @@ The app is on the Google Play store! Search "ardroid robot controller seamonster
 ## Arduino Sketch Installation Instructions
 - Download the [Arduino IDE](https://www.arduino.cc/en/Main/Software)
 - Download the `ardroid.ino` file from this repository. It must be in a folder called `ardroid` (all lowercase).
-- Go to Tools Menu > Board > Boards Manager... and install "Intel Curie Boards."
+- Go to Tools Menu > Board > Boards Manager... and install "Intel Curie Boards." *DON'T* install the newest version! Install version 1.0.6.
+    - If the board has been used with a newer version of the library, you may have to flash an older version of the firmware. Download [this](https://github.com/01org/corelibs-arduino101/releases/download/1.0.7/arduino101-factory_ble-flashpack-ide.tar.bz2) version of the flashpack (not a newer one) and run the `flash_dfu` script (works best on Linux). Newer versions of the firmware have [this](https://github.com/01org/corelibs-arduino101/issues/446) issue.
+- Change the board type to "Arduino/Genuino 101"
 - Go to Sketch > Include Library > Manage Libraries... and install "Adafruit Motor Shield V2 Library."
 - If you are on Linux, open a terminal and run:
     
