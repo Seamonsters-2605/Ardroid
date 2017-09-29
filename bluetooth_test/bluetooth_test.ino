@@ -4,7 +4,8 @@
 
 #include <CurieBLE.h>
 
-#define NUM_BLE_CHARACTERISTICS 10
+// largest possible value without running out of SRAM
+#define NUM_BLE_CHARACTERISTICS 19
 
 //
 //   BLE Services Setup:
@@ -23,14 +24,24 @@ BLEIntCharacteristic bleCharacteristics[NUM_BLE_CHARACTERISTICS] = {
   BLEIntCharacteristic("19B20007-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
   BLEIntCharacteristic("19B20008-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
   BLEIntCharacteristic("19B20009-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
-  BLEIntCharacteristic("19B2000A-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify)
+  BLEIntCharacteristic("19B2000A-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
+
+  BLEIntCharacteristic("19B20011-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("19B20012-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("19B20013-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("19B20014-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("19B20015-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("19B20016-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("19B20017-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("19B20018-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("19B20019-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify)
 };
 
 void setup() {
   while (!Serial) ; // only works when connected
   Serial.begin(9600);
 
-  Serial.println("BLE Test");
+  Serial.println(F("BLE Test"));
 
   //****BLE Setup:*******
   // set advertised local name and service UUID:
@@ -39,19 +50,19 @@ void setup() {
 
   // add service and characteristic:
   blePeripheral.addAttribute(RobotService);
-  
+
   for(int i=0; i<NUM_BLE_CHARACTERISTICS; i++) {
     blePeripheral.addAttribute(bleCharacteristics[i]);
     //set initial value
     bleCharacteristics[i].setValue(0);
   }
 
-  Serial.println("Start advertising...");
-  Serial.println("(if nothing prints after this it didn't work)");
+  Serial.println(F("Start advertising..."));
+  Serial.println(F("(if nothing prints after this it didn't work)"));
   // begin advertising BLE service:
   blePeripheral.begin();
 
-  Serial.println("Ready");
+  Serial.println(F("Ready"));
 }
 
 
@@ -61,7 +72,7 @@ void loop() {
 
   // if a central is connected to peripheral:
   if (central) {
-    Serial.print("Connected: ");
+    Serial.print(F("Connected: "));
     // print the central's MAC address:
     Serial.println(central.address());
 
@@ -69,8 +80,8 @@ void loop() {
     while (central.connected()) {
       for(int i=0; i<NUM_BLE_CHARACTERISTICS; i++) {
         if(bleCharacteristics[i].written()) {
-          Serial.print(i + 1, HEX);
-          Serial.print(" is ");
+          Serial.print(i + 1);
+          Serial.print(F(" is "));
           Serial.println(bleCharacteristics[i].value());
         }
       }
