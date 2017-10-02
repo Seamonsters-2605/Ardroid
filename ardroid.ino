@@ -11,6 +11,8 @@
 #define NUM_DC_MOTORS 4
 #define NUM_STEPPER_MOTORS 2
 
+// #define LOGGING
+
 //
 //   BLE Services Setup:
 //
@@ -19,22 +21,22 @@ BLEService RobotService("19B20000-E8F2-537E-4F6C-D104768A1214"); // BLE robot Se
                        
 // BLE slider Characteristics - custom 128-bit UUID, read and writable by central
 BLEIntCharacteristic dcMotorCharacteristics[NUM_DC_MOTORS] = {
-  BLEIntCharacteristic("19B20001-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
-  BLEIntCharacteristic("19B20002-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
-  BLEIntCharacteristic("19B20003-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
-  BLEIntCharacteristic("19B20004-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("0001", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("0002", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("0003", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("0004", BLERead | BLEWrite | BLENotify),
 };
 BLEIntCharacteristic stepperMotorSettingsCharacteristics[NUM_STEPPER_MOTORS] = {
-  BLEIntCharacteristic("19B20005-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
-  BLEIntCharacteristic("19B20006-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("0005", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("0006", BLERead | BLEWrite | BLENotify),
 };
 BLEIntCharacteristic stepperMotorPositionCharacteristics[NUM_STEPPER_MOTORS] = {
-  BLEIntCharacteristic("19B20007-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
-  BLEIntCharacteristic("19B20008-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("0007", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("0008", BLERead | BLEWrite | BLENotify),
 };
 BLEIntCharacteristic stepperMotorSpeedCharacteristics[NUM_STEPPER_MOTORS] = {
-  BLEIntCharacteristic("19B20009-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
-  BLEIntCharacteristic("19B2000A-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("0009", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("000A", BLERead | BLEWrite | BLENotify),
 };
 
 
@@ -55,10 +57,11 @@ const int ledPin = 13; // pin to use for the LED
 
 
 void setup() {
-  //while (!Serial) ;  //uncomment to use serial moitor to debug
+  #ifdef LOGGING
+  while (!Serial) ;  // wait for serial connection to open
   Serial.begin(9600);
-
-  Serial.println("ARDROID");
+  Serial.println(F("ARDROID"));
+  #endif
 
   // set LED pin to output mode
   pinMode(ledPin, OUTPUT);
@@ -95,7 +98,9 @@ void setupBLE() {
   // begin advertising BLE service:
   blePeripheral.begin();
 
-  Serial.println("BLE LED Peripheral Initialized");
+  #ifdef LOGGING
+  Serial.println(F("BLE LED Peripheral Initialized"));
+  #endif
 }
 
 
@@ -119,7 +124,9 @@ void setupMotors() {
     StepperMotors[i]->setSpeed(100);
   }
 
-  Serial.println("Motors Initialized");
+  #ifdef LOGGING
+  Serial.println(F("Motors Initialized"));
+  #endif
 }
 
 
@@ -130,9 +137,11 @@ void loop() {
 
   // if a central is connected to peripheral:
   if (central) {
-    Serial.print("Connected to central (android device): ");
+    #ifdef LOGGING
+    Serial.print(F("Connected to central (android device): "));
     // print the central's MAC address:
     Serial.println(central.address());
+    #endif
 
     int dcMotorSpeeds[NUM_DC_MOTORS];
     for(int i = 0; i < NUM_DC_MOTORS; i++)
@@ -153,48 +162,77 @@ void loop() {
     unsigned long lastMillis = millis();
     unsigned long timeDiff = 0;
     while (central.connected()) {
+
+      int value; // reused in multiple places for getting characteristic values
       
       for(int i=0; i<NUM_DC_MOTORS; i++) {
         if(dcMotorCharacteristics[i].written()) {
           updateDCMotors = true;
-          dcMotorSpeeds[i] = dcMotorCharacteristics[i].value();
+          value = dcMotorCharacteristics[i].value();
+          dcMotorSpeeds[i] = value;
+          #ifdef LOGGING
+          Serial.print(F("Set DC motor "));
+          Serial.print(i + 1);
+          Serial.print(F(" to "));
+          Serial.println(value);
+          #endif
         }
       }
 
       for(int i=0; i<NUM_STEPPER_MOTORS; i++) {
         if(stepperMotorSettingsCharacteristics[i].written()) {
-          int value = stepperMotorSettingsCharacteristics[i].value();
+          value = stepperMotorSettingsCharacteristics[i].value();
           if(value > 0) {
             // set max speed in RPM
             StepperMotors[i]->setSpeed(value);
             stepperMotorSettingsCharacteristics[i].setValue(0);
-            Serial.print("Set stepper ");
+            #ifdef LOGGING
+            Serial.print(F("Set stepper "));
             Serial.print(i + 1);
-            Serial.print(" max speed to ");
+            Serial.print(F(" max speed to "));
             Serial.println(value);
+            #endif
           } else if(value < 0) {
             // set steps per rotation
             // requires creating a new Adafruit_StepperMotor object
             StepperMotors[i] = AFMS.getStepper(-value, i + 1);
             stepperMotorSettingsCharacteristics[i].setValue(0);
-            Serial.print("Set stepper ");
+            #ifdef LOGGING
+            Serial.print(F("Set stepper "));
             Serial.print(i + 1);
-            Serial.print(" steps per rotation to ");
+            Serial.print(F(" steps per rotation to "));
             Serial.println(-value);
+            #endif
           }
         }
 
         if(stepperMotorPositionCharacteristics[i].written()) {
-          stepperMotorTargetPositions[i] = stepperMotorPositionCharacteristics[i].value();
+          value = stepperMotorPositionCharacteristics[i].value();
+          stepperMotorTargetPositions[i] = value;
+          #ifdef LOGGING
+          Serial.print(F("Set stepper "));
+          Serial.print(i + 1);
+          Serial.print(F(" position to "));
+          Serial.println(value);
+          #endif
         }
 
         if(stepperMotorSpeedCharacteristics[i].written()) {
-          stepperMotorSpeeds[i] = stepperMotorSpeedCharacteristics[i].value();
+          value = stepperMotorSpeedCharacteristics[i].value();
+          stepperMotorSpeeds[i] = value;
+          #ifdef LOGGING
+          Serial.print(F("Set stepper "));
+          Serial.print(i + 1);
+          Serial.print(F(" speed to "));
+          Serial.println(value);
+          #endif
         }
       }
       
       if (dcMotorSpeeds[0] > 255) {   //handle special case of stop command (slider1>255)
-        Serial.println("Recieved all-off command");
+        #ifdef LOGGING
+        Serial.println(F("Recieved all-off command"));
+        #endif
         for(int i=0; i<NUM_DC_MOTORS; i++) {
           dcMotorSpeeds[i] = 0;
           dcMotorCharacteristics[i].setValue(0);
@@ -248,8 +286,10 @@ void loop() {
     } // while  connected
 
     // when the central disconnects, print it out:
+    #ifdef LOGGING
     Serial.print(F("Disconnected from central: "));
     Serial.println(central.address());
+    #endif
   } //if central
   
 }  //end loop
