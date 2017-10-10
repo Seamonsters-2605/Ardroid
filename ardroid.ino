@@ -8,8 +8,13 @@
 #include <Adafruit_MotorShield.h>
 //#include "utility/Adafruit_PWMServoDriver.h"
 
-#define NUM_DC_MOTORS 4
-#define NUM_STEPPER_MOTORS 2
+#define NUM_SHIELDS 2
+
+#define SHIELD_DC_MOTORS 4
+#define SHIELD_STEPPER_MOTORS 2
+
+#define NUM_DC_MOTORS NUM_SHIELDS*SHIELD_DC_MOTORS
+#define NUM_STEPPER_MOTORS NUM_SHIELDS*SHIELD_STEPPER_MOTORS
 
 // #define LOGGING
 
@@ -25,18 +30,28 @@ BLEIntCharacteristic dcMotorCharacteristics[NUM_DC_MOTORS] = {
   BLEIntCharacteristic("0002", BLERead | BLEWrite | BLENotify),
   BLEIntCharacteristic("0003", BLERead | BLEWrite | BLENotify),
   BLEIntCharacteristic("0004", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("0011", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("0012", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("0013", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("0014", BLERead | BLEWrite | BLENotify),
 };
 BLEIntCharacteristic stepperMotorSettingsCharacteristics[NUM_STEPPER_MOTORS] = {
   BLEIntCharacteristic("0005", BLERead | BLEWrite | BLENotify),
   BLEIntCharacteristic("0006", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("0015", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("0016", BLERead | BLEWrite | BLENotify),
 };
 BLEIntCharacteristic stepperMotorPositionCharacteristics[NUM_STEPPER_MOTORS] = {
   BLEIntCharacteristic("0007", BLERead | BLEWrite | BLENotify),
   BLEIntCharacteristic("0008", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("0017", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("0018", BLERead | BLEWrite | BLENotify),
 };
 BLEIntCharacteristic stepperMotorSpeedCharacteristics[NUM_STEPPER_MOTORS] = {
   BLEIntCharacteristic("0009", BLERead | BLEWrite | BLENotify),
   BLEIntCharacteristic("000A", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("0019", BLERead | BLEWrite | BLENotify),
+  BLEIntCharacteristic("001A", BLERead | BLEWrite | BLENotify),
 };
 
 
@@ -105,10 +120,11 @@ void setupBLE() {
 
 
 void setupMotors() {
+  // TODO: allow multiple shields
   for(int i=0; i<NUM_DC_MOTORS; i++)
-    DCMotors[i] = AFMS.getMotor(i + 1); // motor port
+    DCMotors[i] = AFMS.getMotor(i%SHIELD_DC_MOTORS + 1); // motor port
   for(int i=0; i<NUM_STEPPER_MOTORS; i++) {
-    StepperMotors[i] = AFMS.getStepper(200, i + 1); // steps per rotation, motor port
+    StepperMotors[i] = AFMS.getStepper(200, i%SHIELD_STEPPER_MOTORS + 1); // steps per rotation, motor port
   }
 
   //****Motor Shield Setup:*******
@@ -195,7 +211,7 @@ void loop() {
           } else if(value < 0) {
             // set steps per rotation
             // requires creating a new Adafruit_StepperMotor object
-            StepperMotors[i] = AFMS.getStepper(-value, i + 1);
+            StepperMotors[i] = AFMS.getStepper(-value, i%SHIELD_STEPPER_MOTORS + 1); // TODO: update for multiple shields!
             stepperMotorSettingsCharacteristics[i].setValue(0);
             #ifdef LOGGING
             Serial.print(F("Set stepper "));
