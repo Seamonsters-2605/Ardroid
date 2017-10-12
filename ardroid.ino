@@ -16,6 +16,7 @@
 #define NUM_DC_MOTORS NUM_SHIELDS*SHIELD_DC_MOTORS
 #define NUM_STEPPER_MOTORS NUM_SHIELDS*SHIELD_STEPPER_MOTORS
 
+
 // #define LOGGING
 
 //
@@ -55,13 +56,10 @@ BLEIntCharacteristic stepperMotorSpeedCharacteristics[NUM_STEPPER_MOTORS] = {
 };
 
 
-//
-//   Motor Shield Setup:
-//
-// Create the motor shield object with the default I2C address
-Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
-// Or, create it with a different I2C address (say for stacking)
-// Adafruit_MotorShield AFMS = Adafruit_MotorShield(0x61); 
+Adafruit_MotorShield AFMS[NUM_SHIELDS] = {
+  Adafruit_MotorShield(0x60), // bottom motor shield (default)
+  Adafruit_MotorShield(0x61)  // different I2C address - rightmost jumper closed
+};
 
 // Motor ports start at Port 1 at index 0
 Adafruit_DCMotor * DCMotors[NUM_DC_MOTORS];
@@ -120,16 +118,14 @@ void setupBLE() {
 
 
 void setupMotors() {
-  // TODO: allow multiple shields
   for(int i=0; i<NUM_DC_MOTORS; i++)
-    DCMotors[i] = AFMS.getMotor(i%SHIELD_DC_MOTORS + 1); // motor port
+    DCMotors[i] = AFMS[i/SHIELD_DC_MOTORS].getMotor(i%SHIELD_DC_MOTORS + 1); // motor port
   for(int i=0; i<NUM_STEPPER_MOTORS; i++) {
-    StepperMotors[i] = AFMS.getStepper(200, i%SHIELD_STEPPER_MOTORS + 1); // steps per rotation, motor port
+    StepperMotors[i] = AFMS[i/SHIELD_STEPPER_MOTORS].getStepper(200, i%SHIELD_STEPPER_MOTORS + 1); // steps per rotation, motor port
   }
 
-  //****Motor Shield Setup:*******
-  AFMS.begin();  // create with the default frequency 1.6KHz
-  //AFMS.begin(1000);  // OR with a different frequency, say 1KHz
+  for(int i=0; i<NUM_SHIELDS; i++)
+    AFMS[i].begin();  // create with the default frequency 1.6KHz
   
   // Set the speed to start, from 0 (off) to 255 (max speed)
   for(int i=0; i<NUM_DC_MOTORS; i++) {
@@ -211,7 +207,7 @@ void loop() {
           } else if(value < 0) {
             // set steps per rotation
             // requires creating a new Adafruit_StepperMotor object
-            StepperMotors[i] = AFMS.getStepper(-value, i%SHIELD_STEPPER_MOTORS + 1); // TODO: update for multiple shields!
+            StepperMotors[i] = AFMS[i/SHIELD_DC_MOTORS].getStepper(-value, i%SHIELD_STEPPER_MOTORS + 1);
             stepperMotorSettingsCharacteristics[i].setValue(0);
             #ifdef LOGGING
             Serial.print(F("Set stepper "));
