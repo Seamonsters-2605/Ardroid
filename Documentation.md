@@ -29,6 +29,7 @@ describes 3 tags, called `tag1`, `tag2.tag3` and `tag2.tag4`.
 - `addr`: Address of selected device. Temporary.
 - `selectedControl`: Index of selected control to configure, starting at 1. Temporary.
 - `selectedScript`: Script number to edit. Temporary.
+- `upgradeMessage`: Introduced with v1.04. This tag is used to track when the user has updated the app, and to show relevant messages.
 - `config.`
   - `driveMode`: Can be `None`, `Tank`, or `Steer`. Presence of this tag is used to determine if settings screen has been opened.
   - `tank.`
