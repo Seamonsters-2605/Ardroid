@@ -5,6 +5,8 @@ There are two parts to this: an Android app, written with MIT App Inventor 2, se
 
 The app is on the Google Play store! Search "ardroid robot controller seamonsters".
 
+You will need App Inventor 2 to compile the app to an APK. For more information, see `theming/README.md`.
+
 ## Arduino Sketch Installation Instructions
 - Download the [Arduino IDE](https://www.arduino.cc/en/Main/Software)
 - Download the `ardroid.ino` file from this repository. It must be in a folder called `ardroid` (all lowercase).

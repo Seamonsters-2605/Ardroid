@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<style name="Theme.Mytheme" parent="@android:style/Theme.Holo.Light">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:seekBarStyle">@style/BaasSeekBar</item>
+	</style>
+
+	<style name="Theme.Mytheme.Dialog" parent="@android:style/Theme.Holo.Light.Dialog">
+	</style>
+	
+	<style name="BaasSeekBar" parent="@android:style/Widget.Holo.SeekBar">
+        <item name="android:progressDrawable">@drawable/baas_progress_horizontal</item>
+        <item name="android:indeterminateDrawable">@drawable/baas_progress_horizontal</item>
+		<item name="android:minHeight">5dip</item>
+        <item name="android:maxHeight">5dip</item>
+    </style>
+
+</resources>
