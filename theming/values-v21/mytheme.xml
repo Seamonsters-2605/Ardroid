@@ -2,6 +2,7 @@
 <resources>
 
 	<style name="Theme.Mytheme" parent="@android:style/Theme.Material.Light">
+        <item name="android:colorAccent">#FFA100</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
 		<item name="android:textAppearanceButton">@style/Baas_TextAppearance_Material_Button</item>
