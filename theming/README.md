@@ -1,4 +1,4 @@
-The "Holo" theme can optionally be applied to the app to improve the appearance. This is done by editing the APK file with AppToMarket. If you choose not to apply this theme, you should disable "TitleVisible" on every screen of the app - without the theme the app looks better without a title on each screen. However, the custom theme requires TitleVisible to be enabled (it automatically hides it).
+The "Holo" or "Material" theme can optionally be applied to the app to significantly improve the appearance. This is done by editing the APK file with AppToMarket. If you choose not to apply this theme, you should disable "TitleVisible" on every screen of the app - without the theme the app looks better without a title on each screen. However, the custom theme requires TitleVisible to be enabled (it automatically hides it).
 
 # Applying the Holo theme
 
@@ -28,7 +28,7 @@ These instructions are based on [this](http://baasapps.com/app-inventor/theme-ma
     - Find the last <activity> tag near the bottom, for the "ListPickerActivity." Change `android:theme` to `@style/Theme.Mytheme.Dialog`.
     - Save and Close
 - Replace `1.apk` in `C:\Users\...\apktool\Framework\` with the custom `1.apk` file from this repo
-- Go to `..\AppToMarket_v40\temp_myDecompiles\res\`. Delete the existing `values` folder. Copy over the custom `values` and `values-v11`. Copy files from the repo's `drawable` folder to the app's `drawable` folder (but leave the icon there).
+- Go to `..\AppToMarket_v40\temp_myDecompiles\res\`. Delete the existing `values` folder. Copy over the custom `values`, `values-v11`, and `values-v21`. `values-v11` has the Holo theme and `values-v21` has the Material theme, so if you don't want one of those, don't copy it. Copy files from the repo's `drawable` folder to the app's `drawable` folder (but leave the icon there).
 - Click Create New .apk
     - If there's an error, you didn't enter the theme name right or didn't copy the values/drawable files correctly. Or maybe you just need to Decompile again and start over.
 - Click Sign
@@ -45,4 +45,4 @@ These instructions are based on [this](http://baasapps.com/app-inventor/theme-ma
     - Again, make sure every screen has a title and TitleVisible is enabled
     - Sliders cause problems sometimes, but there are things in the values/drawable folders that are supposed to fix this. Make sure everything was copied correctly.
 
-If you continue to have problems, you could give up on having a nice theme and delete `values-v11`.
+If you continue to have problems, you could give up on having a nice theme and delete `values-v11` and `values-v21`.

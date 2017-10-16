@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<style name="Theme.Mytheme" parent="@android:style/Theme.Material.Light">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+		<item name="android:textAppearanceButton">@style/Baas_TextAppearance_Material_Button</item>
+        <item name="android:seekBarStyle">@style/BaasSeekBar</item>
+	</style>
+	
+	<style name="Baas_TextAppearance_Material_Button" parent="@android:style/TextAppearance.Material.Button">
+		<item name="android:textAllCaps">False</item>
+	</style>
+
+	<style name="Theme.Mytheme.Dialog" parent="@android:style/Theme.Material.Light.Dialog">
+	</style>
+	
+	<style name="BaasSeekBar" parent="@android:style/Widget.Material.SeekBar">
+        <item name="android:progressDrawable">@drawable/baas_progress_horizontal</item>
+        <item name="android:indeterminateDrawable">@drawable/baas_progress_horizontal</item>
+		<item name="android:minHeight">5dip</item>
+        <item name="android:maxHeight">5dip</item>
+    </style>
+
+</resources>
