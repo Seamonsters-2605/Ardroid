@@ -1,9 +1,9 @@
 # ARDROID
-A generic robot controller for the Arduino101 board with an Adafruit v2 motor shield. [Here's a demo robot on Thingiverse](http://www.thingiverse.com/thing:1674749) (has an old version of the app and Arduino code).
+A robot controller app for the Arduino101 board with an Adafruit v2 motor shield. [Download on Google Play](https://play.google.com/store/apps/details?id=appinventor.ai_vantjac.Ardroid)
+
+[Here's a demo robot on Thingiverse](http://www.thingiverse.com/thing:1674749) (has an old version of the app and Arduino code).
 
 There are two parts to this: an Android app, written with MIT App Inventor 2, serving as a remote control for the robot; and an Arduino sketch that receives signals from the controller over Bluetooth and moves motors accordingly. The app allows customization of the controls for moving motors and for driving. It also has a rudimentary scripting language; see the `ArdroidScript` directory.
-
-The app is on the Google Play store! Search "ardroid robot controller seamonsters".
 
 You will need App Inventor 2 to compile the app to an APK. For more information, see `theming/README.md`.
 
